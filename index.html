@@ -48,6 +48,11 @@ header .wrap{display:flex;align-items:center;justify-content:space-between;gap:1
 .hero .wrap{display:grid;grid-template-columns:1.2fr 1fr;gap:32px;align-items:center;padding-block:28px 48px}
 .hero h1{font-size:clamp(3rem,8vw,6rem);font-weight:900}
 .hero h1 em{font-style:normal;color:var(--accent)}
+.hero .wrap>div{min-width:0}
+/* Título tipo póster: cada renglón se ajusta para ocupar todo el ancho (lo calcula el script) */
+.hero h1 .ln{display:block;white-space:nowrap;width:max-content;max-width:100%;line-height:.92}
+.chips{flex-wrap:nowrap;gap:6px}
+.chip{flex:1 1 auto;text-align:center;white-space:nowrap;padding:6px 8px;font-size:clamp(.66rem,2.9vw,.9rem);letter-spacing:.05em}
 .hero p{max-width:46ch;color:var(--muted);font-size:1.1rem;margin:18px 0 22px}
 .chips{display:flex;flex-wrap:wrap;gap:8px}
 .chip{font-family:var(--label);font-weight:600;text-transform:uppercase;letter-spacing:.08em;font-size:.9rem;border:1.5px solid var(--line);padding:6px 12px;border-radius:999px}
@@ -216,7 +221,7 @@ footer .wrap{padding-block:28px;display:flex;flex-wrap:wrap;justify-content:spac
   <div class="wrap">
     <div>
       <span class="lbl">Estampado DTF · Mar del Plata</span>
-      <h1 style="margin-top:10px">Remeras con <em>tu marca</em> adelante y atrás</h1>
+      <h1 id="titulo" style="margin-top:10px"><span class="ln">Remeras con</span> <span class="ln"><em>tu marca</em></span> <span class="ln">adelante y atrás</span></h1>
       <p>Para tu banda, tu cumple, tu equipo de trabajo o tu local. Armás los talles, ves el precio al instante y nos mandás el pedido por WhatsApp.</p>
       <div class="chips"><span class="chip">Bandas</span><span class="chip">Cumpleaños</span><span class="chip">Eventos</span><span class="chip">Empresas</span><span class="chip">Comercios</span></div>
     </div>
@@ -460,6 +465,15 @@ footer .wrap{padding-block:28px;display:flex;flex-wrap:wrap;justify-content:spac
   update();
 
   // Video del inicio: si la persona pidió menos movimiento, queda en pausa
+  // Título: cada renglón toma el tamaño justo para llenar el ancho (máx. 150 px)
+  const tit=$("titulo");
+  function fitTitle(){
+    const cw=tit.clientWidth;
+    tit.querySelectorAll(".ln").forEach(l=>{l.style.maxWidth="none";l.style.fontSize="100px";
+      const w=l.getBoundingClientRect().width;l.style.fontSize=Math.min(100*cw/w,150)+"px";l.style.maxWidth=""});
+  }
+  if(tit){fitTitle();if(document.fonts)document.fonts.ready.then(fitTitle);addEventListener("resize",fitTitle)}
+
   // Animaciones con movimiento suave (los valores se acercan de a poco a su destino)
   //  --p: cuánto bajaste en el inicio · --mx/--my: posición del mouse
   const hero=document.querySelector(".hero");
