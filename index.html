@@ -134,6 +134,9 @@ textarea{min-height:70px;resize:vertical}
 
 .note{background:var(--bg);border-left:3px solid var(--accent);padding:10px 12px;font-size:.92rem;margin:0}
 .hint{font-size:.9rem;color:var(--muted);margin:0}
+.hint.ask{margin-top:10px}
+.hint.ask a{color:var(--fg);font-weight:600;text-decoration-color:var(--accent);text-underline-offset:3px}
+.tip{margin:0;padding:10px 12px;border-left:3px solid var(--accent);background:var(--bg);font-size:.95rem}
 
 footer{border-top:1px solid var(--line)}
 footer .wrap{padding-block:28px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;color:var(--muted);font-size:.95rem}
@@ -196,24 +199,13 @@ footer .wrap{padding-block:28px;display:flex;flex-wrap:wrap;justify-content:spac
           <div class="seg">
             <input type="radio" name="color" id="c-neg" value="Negra" checked><label for="c-neg">Negra</label>
             <input type="radio" name="color" id="c-bla" value="Blanca"><label for="c-bla">Blanca</label>
-            <input type="radio" name="color" id="c-otro" value="Otro"><label for="c-otro">Otro color</label>
           </div>
-          <div class="seg more" id="more-colors" hidden>
-              <input type="radio" name="color2" id="c2-0" value="Azul marino" checked><label for="c2-0"><i class="sw" style="background:#1f2a44"></i>Azul marino</label>
-              <input type="radio" name="color2" id="c2-1" value="Azul Francia"><label for="c2-1"><i class="sw" style="background:#2f5bd3"></i>Azul Francia</label>
-              <input type="radio" name="color2" id="c2-2" value="Gris topo"><label for="c2-2"><i class="sw" style="background:#8b8178"></i>Gris topo</label>
-              <input type="radio" name="color2" id="c2-3" value="Gris melange"><label for="c2-3"><i class="sw" style="background:#a3a3a1"></i>Gris melange</label>
-              <input type="radio" name="color2" id="c2-4" value="Marrón"><label for="c2-4"><i class="sw" style="background:#6b4a33"></i>Marrón</label>
-              <input type="radio" name="color2" id="c2-5" value="Manteca"><label for="c2-5"><i class="sw" style="background:#f1e4bf"></i>Manteca</label>
-              <input type="radio" name="color2" id="c2-6" value="Verde militar"><label for="c2-6"><i class="sw" style="background:#4b5320"></i>Verde militar</label>
-              <input type="radio" name="color2" id="c2-7" value="Rojo"><label for="c2-7"><i class="sw" style="background:#c62828"></i>Rojo</label>
-              <input type="radio" name="color2" id="c2-8" value="Bordeaux"><label for="c2-8"><i class="sw" style="background:#6d1a2a"></i>Bordeaux</label>
-              <input type="radio" name="color2" id="c2-otro" value="Otro"><label for="c2-otro">Otro</label>
-          </div>
+          <p class="hint ask">¿Otro color? <a href="https://wa.me/5492233040480?text=Hola%20aires!%20Quer%C3%ADa%20consultar%20por%20remeras%20de%20otro%20color." target="_blank" rel="noopener">Consultanos por WhatsApp</a></p>
         </fieldset>
         <fieldset>
           <legend class="lbl">Cantidad por talle</legend>
           <div class="sizes" id="sizes"></div>
+          <p class="hint ask">¿Talles más grandes? <a href="https://wa.me/5492233040480?text=Hola%20aires!%20Quer%C3%ADa%20consultar%20por%20talles%20m%C3%A1s%20grandes." target="_blank" rel="noopener">Consultanos por WhatsApp</a></p>
         </fieldset>
         <fieldset>
           <legend class="lbl">Tu nombre y comentarios</legend>
@@ -329,13 +321,7 @@ footer .wrap{padding-block:28px;display:flex;flex-wrap:wrap;justify-content:spac
   $("f").addEventListener("submit",e=>e.preventDefault());
 
   function val(name){return document.querySelector(`input[name="${name}"]:checked`).value}
-  function colorTxt(){
-    if(val("color")!=="Otro")return val("color");
-    const c=val("color2");return c==="Otro"?"otro (te lo detallo por acá)":c;
-  }
-  $("f").addEventListener("change",()=>{const on=val("color")==="Otro";$("more-colors").hidden=!on});
-
-
+  function colorTxt(){return val("color")}
 
   function update(){
     const list=sizeList();const total=list.reduce((a,[,n])=>a+n,0);
@@ -349,7 +335,15 @@ footer .wrap{padding-block:28px;display:flex;flex-wrap:wrap;justify-content:spac
       `<div><span>Talles</span><span>${list.map(([s,n])=>s+" ×"+n).join(" · ")||"—"}</span></div>`;
     const okMin=total>=1;
     const st=$("state");
-    st.hidden=true;
+    // Aviso: si sumando unas pocas remeras llega al tramo siguiente y paga menos en total
+    const sig=PRECIOS.find(t=>t.desde>total);
+    let tip="";
+    if(total&&sig){
+      const faltan=sig.desde-total;
+      const totalSig=sig.desde*sig.precio+extra;
+      if(totalSig<=amount) tip=`Sumando ${faltan} ${faltan===1?"remera":"remeras"} más (${sig.desde} en total) pagás ${fmt(totalSig)} en vez de ${fmt(amount)}.`;
+    }
+    st.className="tip";st.hidden=!tip;st.textContent=tip;
     const nombre=$("nombre").value.trim();
     const notas=$("notas").value.trim();
     const msg=[
