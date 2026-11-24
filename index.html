@@ -65,15 +65,9 @@ header .wrap{display:flex;align-items:center;justify-content:space-between;gap:1
   translate:0 calc(var(--p,0)*-40px);scale:calc(1 - var(--p,0)*.08);
   transform:rotateX(calc(var(--my,0)*-8deg)) rotateY(calc(var(--mx,0)*10deg));transform-style:preserve-3d;
   animation:drop 1.2s cubic-bezier(.2,.8,.2,1) .25s backwards}
-.spin{position:relative;width:100%;aspect-ratio:488/620;transform-style:preserve-3d;--d:8px;animation:spin 6s linear 1.4s infinite,float 6s ease-in-out infinite}
+.spin{position:relative;width:100%;aspect-ratio:488/620;transform-style:preserve-3d;animation:spin 6s linear 1.4s infinite}
 .spin .face{position:absolute;inset:0;display:grid;place-items:center;backface-visibility:hidden;-webkit-backface-visibility:hidden}
-.spin .face.front{transform:translateZ(var(--d))}
-.spin .face.back{transform:rotateY(180deg) translateZ(var(--d))}
-/* Espesor: capas de la remera apiladas entre el frente y la espalda, así de costado no queda plana */
-.spin .slice{position:absolute;inset:0;display:grid;place-items:center;pointer-events:none;backface-visibility:hidden;-webkit-backface-visibility:hidden}
-.spin .slice img{width:100%;height:auto;filter:brightness(.86)}
-.spin .slice.b img{width:92%}
-.spin .side{position:absolute;left:calc(50% - var(--d));top:6%;width:calc(var(--d)*2);height:90%;border-radius:8px;transform:rotateY(90deg);background:linear-gradient(180deg,#e9e6e1,#cfcac3 60%,#bdb8b0);pointer-events:none}
+.spin .face.back{transform:rotateY(180deg)}
 .spin .face.back .frame{width:92%}
 .spin .frame{transform:none}
 .spin-wrap .stamp{position:static;transform:rotate(-4deg)}
@@ -488,20 +482,6 @@ footer .wrap{padding-block:28px;display:flex;flex-wrap:wrap;justify-content:spac
   update();
 
   // Video del inicio: si la persona pidió menos movimiento, queda en pausa
-  // Espesor de la remera que gira: capas intermedias (se arman solas a partir de la foto de adelante)
-  const spin=document.querySelector(".spin");
-  if(spin){
-    // mitad de adelante con la foto de frente, mitad de atrás con la de espalda + una franja de costado
-    const fr=spin.querySelector(".face.front img").src,bk=spin.querySelector(".face.back img").src;const N=10;
-    for(let i=0;i<N;i++){
-      const z=-1+2*(i+.5)/N; // de -1 (espalda) a 1 (frente)
-      const d=document.createElement("div");d.className="slice"+(z<0?" b":"");d.setAttribute("aria-hidden","true");
-      d.style.transform=`translateZ(calc(var(--d) * ${z.toFixed(3)}))`+(z<0?" rotateY(180deg)":"");
-      const im=document.createElement("img");im.src=z<0?bk:fr;im.alt="";d.appendChild(im);spin.appendChild(d);
-    }
-    const side=document.createElement("div");side.className="side";side.setAttribute("aria-hidden","true");spin.appendChild(side);
-  }
-
   // Flechita para volver arriba: aparece cuando ya bajaste un poco
   const up=$("to-top");
   const upChk=()=>up.classList.toggle("on",scrollY>innerHeight*.6);
