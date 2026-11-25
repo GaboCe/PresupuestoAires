@@ -59,7 +59,7 @@ header .wrap{display:flex;align-items:center;justify-content:space-between;gap:1
 .hero{position:relative;overflow:hidden}
 .stage{position:relative;min-width:0;display:grid;place-items:center;padding-block:20px}
 .ghostlogo{position:absolute;right:-6%;bottom:-6%;width:min(78%,420px);height:auto;fill:none;stroke:var(--line);stroke-width:.45;pointer-events:none;transform:translateX(calc(var(--p,0)*-70px)) rotate(calc(var(--p,0)*-4deg))}
-.halo{position:absolute;width:min(96%,440px);aspect-ratio:1;border-radius:50%;border:1.5px solid color-mix(in srgb,var(--accent) 55%,transparent);box-shadow:0 0 90px color-mix(in srgb,var(--accent) 28%,transparent),inset 0 0 70px color-mix(in srgb,var(--accent) 14%,transparent);animation:halo 9s ease-in-out infinite;transform:scale(calc(1 + var(--p,0)*.25));opacity:calc(1 - var(--p,0)*.6)}
+.halo{position:absolute;left:50%;top:50%;width:104%;margin:-52% 0 0 -52%;aspect-ratio:1;border-radius:50%;border:1.5px solid color-mix(in srgb,var(--accent) 55%,transparent);box-shadow:0 0 90px color-mix(in srgb,var(--accent) 28%,transparent),inset 0 0 70px color-mix(in srgb,var(--accent) 14%,transparent);animation:halo 9s ease-in-out infinite;transform:scale(calc(1 + var(--p,0)*.25));opacity:calc(1 - var(--p,0)*.6)}
 /* Inicio: una remera que gira suave y constante (6s = una vuelta; subí el número para más lento) */
 .spin-wrap{position:relative;z-index:1;width:min(84%,390px);display:grid;justify-items:center;gap:22px;perspective:1400px;
   translate:0 calc(var(--p,0)*-40px);scale:calc(1 - var(--p,0)*.08);
@@ -71,7 +71,7 @@ header .wrap{display:flex;align-items:center;justify-content:space-between;gap:1
 .spin canvas{position:absolute;inset:0;width:100%;height:100%;opacity:0;transition:opacity .6s}
 .spin.ok canvas{opacity:1}.spin.ok .poster{opacity:0}
 .spin img.on{opacity:1}
-.spin-wrap .stamp{position:static;transform:rotate(-4deg)}
+.spin-wrap .stamp{position:relative;z-index:2;align-self:start;transform:rotate(-4deg);margin-top:calc(-22px - 9%)} /* pegado al ruedo de la remera */
 
 /* taller: video */
 .taller .wrap{display:grid;grid-template-columns:minmax(0,340px) 1fr;gap:48px;align-items:center}
@@ -242,9 +242,9 @@ footer .wrap{padding-block:28px;display:flex;flex-wrap:wrap;justify-content:spac
     </div>
     <div class="stage">
       <svg class="ghostlogo" viewBox="0 0 150 151" aria-hidden="true"><use href="#logo" width="150" height="151"/></svg>
-      <span class="halo" aria-hidden="true"></span>
     <div class="spin-wrap">
       <div class="spin" id="spin" role="img" aria-label="Remera blanca aires girando en 3D: logo chico adelante y grande en la espalda">
+        <span class="halo" aria-hidden="true"></span>
         <img class="poster" src="remera-0.webp" alt="" width="650" height="702">
         <canvas id="tee"></canvas>
       </div>
