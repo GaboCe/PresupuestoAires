@@ -6,6 +6,15 @@
 <meta name="description" content="Remeras estampadas DTF en Mar del Plata para bandas, eventos, empresas y comercios. Armá tu pedido y mandalo por WhatsApp.">
 <meta property="og:title" content="aires · remeras estampadas">
 <meta property="og:description" content="Remeras con tu marca adelante y atrás. Mar del Plata.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://aires.gabrielasa.com.ar/">
+<meta property="og:image" content="https://aires.gabrielasa.com.ar/og-aires.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#141210">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}.ig-btn{flex:0 1 auto;max-width:100%;text-align:center;text-decoration:none;font-size:.95rem;padding:10px 16px}
 </style>
 <title>Remeras aires</title>
@@ -73,6 +82,16 @@ header .wrap{display:flex;align-items:center;justify-content:space-between;gap:1
 .spin img.on{opacity:1}
 .spin-wrap .stamp{position:relative;z-index:2;align-self:start;transform:rotate(-4deg);margin-top:calc(-22px - 11.5%)} /* pegado al ruedo de la remera */
 
+/* Controles debajo de la remera 3D */
+.tee-ctrl{position:relative;z-index:2;display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;margin-top:4px}
+.tee-col{display:flex;gap:8px}
+.dot{width:30px;height:30px;border-radius:50%;border:2px solid var(--line);cursor:pointer;padding:0}
+.dot.negra{background:#1b1a19}.dot.blanca{background:#f4f2ee}
+.dot[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 30%,transparent)}
+.tee-up{cursor:pointer;padding:9px 14px;font-size:.92rem}
+.tee-msg{position:relative;z-index:2;margin:0;max-width:34ch;text-align:center;font-size:.88rem;color:var(--muted)}
+.tee-msg button{background:none;border:0;padding:0;color:var(--fg);text-decoration:underline;text-decoration-color:var(--accent);cursor:pointer;font:inherit}
+
 /* taller: video */
 .taller .wrap{display:grid;grid-template-columns:minmax(0,340px) 1fr;gap:48px;align-items:center}
 .reel{position:relative;margin:0;width:100%;aspect-ratio:9/16;border-radius:18px;overflow:hidden;background:#000;box-shadow:0 30px 70px rgba(0,0,0,.5),0 0 60px color-mix(in srgb,var(--accent) 18%,transparent),0 0 0 1px rgba(255,255,255,.08)}
@@ -80,7 +99,7 @@ header .wrap{display:flex;align-items:center;justify-content:space-between;gap:1
 .reel::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.28),transparent 22%,transparent 78%,rgba(0,0,0,.3));pointer-events:none}
 .live{position:absolute;left:12px;top:12px;z-index:1;display:flex;align-items:center;gap:7px;font:600 .78rem var(--label);letter-spacing:.1em;text-transform:uppercase;color:#fff;background:rgba(0,0,0,.45);backdrop-filter:blur(6px);padding:5px 10px;border-radius:999px}
 .live i{width:7px;height:7px;border-radius:50%;background:var(--accent);animation:blink 1.6s ease-in-out infinite}
-.feats{list-style:none;margin:0 0 26px;padding:0;display:grid}
+.feats{list-style:none;margin:12px 0 26px;padding:0;display:grid}
 .feats li{display:flex;gap:16px;align-items:baseline;padding:16px 0;border-top:1px solid var(--line)}
 .feats li:last-child{border-bottom:1px solid var(--line)}
 .feats .fs-n{font:900 1rem var(--display);color:var(--accent);letter-spacing:.1em}
@@ -249,6 +268,14 @@ footer .wrap{padding-block:28px;display:flex;flex-wrap:wrap;justify-content:spac
         <canvas id="tee"></canvas>
       </div>
       <span class="stamp">S · M · L · XL · XXL</span>
+      <div class="tee-ctrl" id="tee-ctrl" hidden>
+        <div class="tee-col" role="group" aria-label="Color de la remera">
+          <button type="button" class="dot negra" data-color="Negra" aria-label="Remera negra"></button>
+          <button type="button" class="dot blanca" data-color="Blanca" aria-label="Remera blanca"></button>
+        </div>
+        <label class="btn ghost tee-up"><input type="file" id="tee-file" accept="image/png,image/jpeg,image/webp,image/svg+xml" hidden>Probá con tu logo</label>
+      </div>
+      <p class="tee-msg" id="tee-msg" hidden>Así quedaría tu logo. Acordate de mandarlo por WhatsApp cuando hagas el pedido. <button type="button" id="tee-reset">Volver al de aires</button></p>
     </div>
     </div>
   </div>
@@ -261,10 +288,11 @@ footer .wrap{padding-block:28px;display:flex;flex-wrap:wrap;justify-content:spac
       <figcaption class="live"><i></i>Hecho en Mar del Plata</figcaption>
     </figure>
     <div class="taller-txt">
+      <span class="lbl">Cómo funciona</span>
       <ul class="feats">
-        <li><span class="fs-n">01</span><div><b>Remera Premium</b><span>Algodón peinado 24.1</span></div></li>
-        <li><span class="fs-n">02</span><div><b>Estampa DTF</b><span>Adelante y atrás</span></div></li>
-        <li><span class="fs-n">03</span><div><b>Talles S al XXL</b><span>Y XXXL como talle especial</span></div></li>
+        <li><span class="fs-n">01</span><div><b>Armá tu pedido</b><span>Elegí color y talles acá abajo y ves el precio al instante.</span></div></li>
+        <li><span class="fs-n">02</span><div><b>Mandalo por WhatsApp</b><span>Con tu logo. Confirmamos el diseño y abonás la seña del 50%.</span></div></li>
+        <li><span class="fs-n">03</span><div><b>Estampamos tus remeras</b><span>Te avisamos cuando están listas.</span></div></li>
       </ul>
       <a class="btn main" href="#pedido">Armar mi pedido</a>
     </div>
@@ -417,7 +445,15 @@ footer .wrap{padding-block:28px;display:flex;flex-wrap:wrap;justify-content:spac
   function val(name){return document.querySelector(`input[name="${name}"]:checked`).value}
   function colorTxt(){return val("color")}
 
+  // El pedido se guarda en este navegador: si el cliente se va y vuelve, encuentra lo que había cargado
+  const KEY="aires-pedido";
+  function guardar(){try{localStorage.setItem(KEY,JSON.stringify({qty,color:val("color"),nombre:$("nombre").value,notas:$("notas").value}))}catch(e){}}
+  (function recuperar(){try{const d=JSON.parse(localStorage.getItem(KEY)||"null");if(!d)return;
+    SIZES.forEach(s=>{const n=parseInt(d.qty&&d.qty[s],10)||0;qty[s]=n;const el=$("q-"+s);if(el)el.value=n});
+    const r=document.querySelector(`input[name="color"][value="${d.color}"]`);if(r)r.checked=true;
+    $("nombre").value=d.nombre||"";$("notas").value=d.notas||"";}catch(e){}})();
   function update(){
+    guardar();
     const list=sizeList();const total=list.reduce((a,[,n])=>a+n,0);
     const unit=precioPorRemera(total);
     const especiales=qty.XXXL;
@@ -480,6 +516,11 @@ footer .wrap{padding-block:28px;display:flex;flex-wrap:wrap;justify-content:spac
   });
 
   update();
+
+  // Color del formulario <-> color de la remera 3D
+  document.querySelectorAll('input[name="color"]').forEach(r=>r.addEventListener("change",()=>{if(window.tee)window.tee.color(val("color"))}));
+  window.pedidoColor=()=>val("color");
+  window.elegirColor=c=>{const r=document.querySelector(`input[name="color"][value="${c}"]`);if(r&&!r.checked){r.checked=true;r.dispatchEvent(new Event("change",{bubbles:true}))}};
 
   // Video del inicio: si la persona pidió menos movimiento, queda en pausa
   // Flechita para volver arriba: aparece cuando ya bajaste un poco
@@ -558,13 +599,37 @@ try{
   const pivot=new THREE.Group();sc.add(pivot);
   const tela=new THREE.MeshPhysicalMaterial({color:0xf4f2ee,roughness:.92,sheen:1,sheenRoughness:.8,sheenColor:new THREE.Color(0xffffff),side:THREE.DoubleSide});
   const tex=await new THREE.TextureLoader().loadAsync("./3d/logo-tela.png");tex.colorSpace=THREE.SRGBColorSpace;tex.anisotropy=8;
+  // versión blanca del logo aires para la remera negra
+  const blanca=(()=>{const im=tex.image,c=document.createElement("canvas");c.width=im.width;c.height=im.height;const x=c.getContext("2d");x.drawImage(im,0,0);x.globalCompositeOperation="source-in";x.fillStyle="#f4f2ee";x.fillRect(0,0,c.width,c.height);const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=8;return t})();
   const tinta=new THREE.MeshStandardMaterial({map:tex,transparent:true,roughness:.6,polygonOffset:true,polygonOffsetFactor:-4,depthWrite:false});
   const gl=new GLTFLoader();const m=(await gl.loadAsync("./3d/remera.glb").catch(()=>gl.loadAsync("./3d/remera.wasm"))).scene; // .wasm: copia solo para la vista previa
   m.traverse(o=>{if(o.isMesh)o.material=tela});m.updateMatrixWorld(true);
   const find=n=>{let f;m.traverse(o=>{if(o.isMesh&&o.name.startsWith(n))f=f||o});return f};
-  const asp=tex.image.height/tex.image.width;
-  const decal=(mesh,d,rotY)=>{const g=new DecalGeometry(mesh,new THREE.Vector3(...d.pos),new THREE.Euler(0,rotY,0),new THREE.Vector3(d.ancho,d.ancho*asp,.3));const x=new THREE.Mesh(g,tinta);x.renderOrder=2;m.add(x)};
-  decal(find("Body_Front"),FRENTE,0);decal(find("Body_Back"),ESPALDA,Math.PI);
+  const fMesh=find("Body_Front"),bMesh=find("Body_Back");
+  let decals=[];
+  const ponerLogo=(t,anchoF,anchoB)=>{
+    decals.forEach(d=>{m.remove(d);d.geometry.dispose()});decals=[];
+    const asp=t.image.height/t.image.width;tinta.map=t;tinta.needsUpdate=true;
+    // logos muy altos se limitan por alto para que no se salgan del pecho/espalda
+    const mk=(mesh,d,rotY,w,maxH)=>{const ww=Math.min(w,maxH/asp);m.updateMatrixWorld(true);const g=new DecalGeometry(mesh,m.localToWorld(new THREE.Vector3(...d.pos)),new THREE.Euler(0,rotY+pivot.rotation.y,0),new THREE.Vector3(ww,ww*asp,.3).multiplyScalar(pivot.scale.x));g.applyMatrix4(m.matrixWorld.clone().invert());const x=new THREE.Mesh(g,tinta);x.renderOrder=2;m.add(x);decals.push(x)};
+    mk(fMesh,FRENTE,0,anchoF,.1);mk(bMesh,ESPALDA,Math.PI,anchoB,.28);
+  };
+  let propio=null;
+  const pintar=c=>{const negra=c==="Negra";tela.color.set(negra?0x2a2826:0xf4f2ee);tela.sheenColor.set(negra?0x6a6866:0xffffff);
+    if(!propio)ponerLogo(negra?blanca:tex,FRENTE.ancho,ESPALDA.ancho);
+    document.querySelectorAll(".dot").forEach(b=>b.setAttribute("aria-pressed",b.dataset.color===c))};
+  ponerLogo(tex,FRENTE.ancho,ESPALDA.ancho);
+  window.tee={color:pintar};
+  pintar(window.pedidoColor?window.pedidoColor():"Blanca");
+  document.getElementById("tee-ctrl").hidden=false;
+  document.querySelectorAll(".dot").forEach(b=>b.addEventListener("click",()=>{window.elegirColor?window.elegirColor(b.dataset.color):pintar(b.dataset.color)}));
+  const msg=document.getElementById("tee-msg");
+  document.getElementById("tee-file").addEventListener("change",e=>{const f=e.target.files[0];if(!f)return;
+    const url=URL.createObjectURL(f),img=new Image();
+    img.onload=()=>{const c=document.createElement("canvas"),k=Math.min(1,1024/Math.max(img.width,img.height));c.width=Math.max(1,Math.round(img.width*k));c.height=Math.max(1,Math.round(img.height*k));c.getContext("2d").drawImage(img,0,0,c.width,c.height);
+      const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=8;propio=t;ponerLogo(t,.09,.24);msg.hidden=false;URL.revokeObjectURL(url)};
+    img.src=url;e.target.value=""});
+  document.getElementById("tee-reset").addEventListener("click",()=>{propio=null;msg.hidden=true;pintar(window.pedidoColor?window.pedidoColor():"Blanca")});
   const bb=new THREE.Box3().setFromObject(m),c=bb.getCenter(new THREE.Vector3()),sz=bb.getSize(new THREE.Vector3());
   m.position.sub(c);pivot.add(m);pivot.scale.setScalar(1/sz.y);
   const fit=()=>{const w=cv.clientWidth,h=cv.clientHeight;if(!w||!h)return;r.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix()};
