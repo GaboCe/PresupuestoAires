@@ -66,9 +66,10 @@ header .wrap{display:flex;align-items:center;justify-content:space-between;gap:1
   transform:rotateX(calc(var(--my,0)*-8deg)) rotateY(calc(var(--mx,0)*10deg));transform-style:preserve-3d;
   animation:drop 1.2s cubic-bezier(.2,.8,.2,1) .25s backwards}
 /* Giro con 6 fotos (frente, 3/4, costado, espalda, costado, 3/4) que se funden entre sí */
-.spin{position:relative;width:100%;aspect-ratio:650/702;filter:drop-shadow(0 26px 22px rgba(0,0,0,.5))}
-.spin img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0}
-.spin canvas{position:absolute;inset:0;width:100%;height:100%}
+.spin{position:relative;width:100%;aspect-ratio:650/702;filter:drop-shadow(0 26px 22px rgba(0,0,0,.45))}
+.spin .poster{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;transition:opacity .6s}
+.spin canvas{position:absolute;inset:0;width:100%;height:100%;opacity:0;transition:opacity .6s}
+.spin.ok canvas{opacity:1}.spin.ok .poster{opacity:0}
 .spin img.on{opacity:1}
 .spin-wrap .stamp{position:static;transform:rotate(-4deg)}
 
@@ -243,13 +244,9 @@ footer .wrap{padding-block:28px;display:flex;flex-wrap:wrap;justify-content:spac
       <svg class="ghostlogo" viewBox="0 0 150 151" aria-hidden="true"><use href="#logo" width="150" height="151"/></svg>
       <span class="halo" aria-hidden="true"></span>
     <div class="spin-wrap">
-      <div class="spin" id="spin" role="img" aria-label="Remera blanca aires girando: logo chico adelante y grande en la espalda">
-        <img src="remera-0.webp" alt="" width="650" height="702" class="on">
-        <img src="remera-1.webp" alt="" width="650" height="702" loading="eager">
-        <img src="remera-2.webp" alt="" width="650" height="702" loading="eager">
-        <img src="remera-3.webp" alt="" width="650" height="702" loading="eager">
-        <img src="remera-4.webp" alt="" width="650" height="702" loading="eager">
-        <img src="remera-5.webp" alt="" width="650" height="702" loading="eager">
+      <div class="spin" id="spin" role="img" aria-label="Remera blanca aires girando en 3D: logo chico adelante y grande en la espalda">
+        <img class="poster" src="remera-0.webp" alt="" width="650" height="702">
+        <canvas id="tee"></canvas>
       </div>
       <span class="stamp">S · M · L · XL · XXL</span>
     </div>
@@ -485,30 +482,6 @@ footer .wrap{padding-block:28px;display:flex;flex-wrap:wrap;justify-content:spac
   update();
 
   // Video del inicio: si la persona pidió menos movimiento, queda en pausa
-  // Remera que gira: va fundiendo una foto con la siguiente (VUELTA = segundos por vuelta completa)
-  const VUELTA=6;
-  const AN=[571,387,248,571,248,387]; // ancho de la remera en cada foto (frente, 3/4, costado, espalda, costado, 3/4)
-  const sp=$("spin");
-  if(sp&&!matchMedia("(prefers-reduced-motion: reduce)").matches){
-    // Se dibuja en un canvas sumando las dos fotos ("lighter"): así el fundido queda sólido, sin transparencias
-    const im=[...sp.querySelectorAll("img")],n=im.length;
-    const cv=document.createElement("canvas");cv.width=650;cv.height=702;const cx=cv.getContext("2d");
-    let t0=null,started=false;
-    const step=t=>{
-      if(im.every(x=>x.complete&&x.naturalWidth)){
-        if(!started){started=true;sp.appendChild(cv);im.forEach(x=>x.style.visibility="hidden");t0=t}
-        const a=((t-t0)/1000/VUELTA*n)%n,i=Math.floor(a),k=a-i,j=(i+1)%n;
-        // las dos fotos se estiran/angostan para coincidir en ancho mientras se funden (parece que gira)
-        const W=AN[i]+(AN[j]-AN[i])*k;
-        const draw=(x,al,op)=>{const sx=W/AN[x],w=650*sx;cx.globalCompositeOperation=op;cx.globalAlpha=al;cx.drawImage(im[x],324-324*sx,0,w,702)};
-        cx.globalCompositeOperation="source-over";cx.globalAlpha=1;cx.clearRect(0,0,650,702);
-        draw(i,1-k,"source-over");draw(j,k,"lighter");
-      }
-      requestAnimationFrame(step);
-    };
-    requestAnimationFrame(step);
-  }
-
   // Flechita para volver arriba: aparece cuando ya bajaste un poco
   const up=$("to-top");
   const upChk=()=>up.classList.toggle("on",scrollY>innerHeight*.6);
@@ -563,5 +536,48 @@ footer .wrap{padding-block:28px;display:flex;flex-wrap:wrap;justify-content:spac
 })();
 </script>
 
+<script type="module">
+/* Remera 3D que gira (three.js). VUELTA = segundos por vuelta completa.
+   Logo adelante: posición y ancho en FRENTE; logo atrás: en ESPALDA (medidas en metros del modelo). */
+const VUELTA=6;
+const FRENTE={pos:[0.085,1.47,0.15],ancho:0.085};
+const ESPALDA={pos:[0,1.40,-0.14],ancho:0.23};
+const box=document.getElementById("spin"),cv=document.getElementById("tee");
+try{
+  const THREE=await import("./3d/three.module.min.js");
+  const {GLTFLoader}=await import("./3d/GLTFLoader.js");
+  const {DecalGeometry}=await import("./3d/DecalGeometry.js");
+  const {RoomEnvironment}=await import("./3d/RoomEnvironment.js");
+  const r=new THREE.WebGLRenderer({canvas:cv,antialias:true,alpha:true});
+  r.setPixelRatio(Math.min(devicePixelRatio,2));r.toneMapping=THREE.ACESFilmicToneMapping;r.outputColorSpace=THREE.SRGBColorSpace;
+  const sc=new THREE.Scene();
+  sc.environment=new THREE.PMREMGenerator(r).fromScene(new RoomEnvironment(),0.04).texture;
+  const cam=new THREE.PerspectiveCamera(28,1,.1,20);cam.position.set(0,0,2.55);
+  const key=new THREE.DirectionalLight(0xffffff,1.2);key.position.set(1.5,2,2.5);sc.add(key);
+  const rim=new THREE.DirectionalLight(0xffc9a0,.8);rim.position.set(-2,1,-2);sc.add(rim);
+  const pivot=new THREE.Group();sc.add(pivot);
+  const tela=new THREE.MeshPhysicalMaterial({color:0xf4f2ee,roughness:.92,sheen:1,sheenRoughness:.8,sheenColor:new THREE.Color(0xffffff),side:THREE.DoubleSide});
+  const tex=await new THREE.TextureLoader().loadAsync("./3d/logo-tela.png");tex.colorSpace=THREE.SRGBColorSpace;tex.anisotropy=8;
+  const tinta=new THREE.MeshStandardMaterial({map:tex,transparent:true,roughness:.6,polygonOffset:true,polygonOffsetFactor:-4,depthWrite:false});
+  const m=(await new GLTFLoader().loadAsync("./3d/remera.glb")).scene;
+  m.traverse(o=>{if(o.isMesh)o.material=tela});m.updateMatrixWorld(true);
+  const find=n=>{let f;m.traverse(o=>{if(o.isMesh&&o.name.startsWith(n))f=f||o});return f};
+  const asp=tex.image.height/tex.image.width;
+  const decal=(mesh,d,rotY)=>{const g=new DecalGeometry(mesh,new THREE.Vector3(...d.pos),new THREE.Euler(0,rotY,0),new THREE.Vector3(d.ancho,d.ancho*asp,.3));const x=new THREE.Mesh(g,tinta);x.renderOrder=2;m.add(x)};
+  decal(find("Body_Front"),FRENTE,0);decal(find("Body_Back"),ESPALDA,Math.PI);
+  const bb=new THREE.Box3().setFromObject(m),c=bb.getCenter(new THREE.Vector3()),sz=bb.getSize(new THREE.Vector3());
+  m.position.sub(c);pivot.add(m);pivot.scale.setScalar(1/sz.y);
+  const fit=()=>{const w=cv.clientWidth,h=cv.clientHeight;if(!w||!h)return;r.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix()};
+  fit();addEventListener("resize",fit);
+  const calm=matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let visible=true,last=performance.now(),ang=0;
+  new IntersectionObserver(e=>{visible=e[0].isIntersecting}).observe(cv);
+  const loop=t=>{const dt=Math.min((t-last)/1000,.1);last=t;
+    if(visible){if(!calm)ang+=dt*Math.PI*2/VUELTA;pivot.rotation.y=ang;r.render(sc,cam)}
+    requestAnimationFrame(loop)};
+  requestAnimationFrame(loop);
+  box.classList.add("ok");
+}catch(e){console.warn("Remera 3D no disponible, queda la foto",e)}
+</script>
 </body>
 </html>
