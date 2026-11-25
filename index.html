@@ -559,7 +559,7 @@ try{
   const tela=new THREE.MeshPhysicalMaterial({color:0xf4f2ee,roughness:.92,sheen:1,sheenRoughness:.8,sheenColor:new THREE.Color(0xffffff),side:THREE.DoubleSide});
   const tex=await new THREE.TextureLoader().loadAsync("./3d/logo-tela.png");tex.colorSpace=THREE.SRGBColorSpace;tex.anisotropy=8;
   const tinta=new THREE.MeshStandardMaterial({map:tex,transparent:true,roughness:.6,polygonOffset:true,polygonOffsetFactor:-4,depthWrite:false});
-  const m=(await new GLTFLoader().loadAsync("./3d/remera.glb")).scene;
+  const gl=new GLTFLoader();const m=(await gl.loadAsync("./3d/remera.glb").catch(()=>gl.loadAsync("./3d/remera.wasm"))).scene; // .wasm: copia solo para la vista previa
   m.traverse(o=>{if(o.isMesh)o.material=tela});m.updateMatrixWorld(true);
   const find=n=>{let f;m.traverse(o=>{if(o.isMesh&&o.name.startsWith(n))f=f||o});return f};
   const asp=tex.image.height/tex.image.width;
