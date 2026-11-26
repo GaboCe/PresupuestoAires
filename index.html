@@ -60,11 +60,11 @@ header .wrap{display:flex;align-items:center;justify-content:space-between;gap:1
 .hero .wrap>div{min-width:0}
 /* Título tipo póster: cada renglón se ajusta para ocupar todo el ancho (lo calcula el script) */
 .hero h1 .ln{display:block;white-space:nowrap;width:max-content;max-width:100%;line-height:.92}
-.chips{flex-wrap:nowrap;gap:6px}
-.chip{flex:1 1 auto;text-align:center;white-space:nowrap;padding:6px 8px;font-size:clamp(.72rem,3.6vw,.95rem);letter-spacing:.05em}
 .hero p{max-width:46ch;color:var(--muted);font-size:1.1rem;margin:18px 0 22px}
-.chips{display:flex;flex-wrap:wrap;gap:8px}
-.chip{font-family:var(--label);font-weight:600;text-transform:uppercase;letter-spacing:.08em;font-size:.9rem;border:1.5px solid var(--line);padding:6px 12px;border-radius:999px}
+.chips{display:flex;flex-wrap:nowrap;align-items:center;gap:0;margin:14px 0 0;color:var(--muted)}
+.chips span+span::before{content:"·";margin:0 .6em;color:var(--accent)}
+.hero-cta{display:inline-flex;margin-top:22px;text-decoration:none;min-width:220px;justify-content:center}
+.chips span{font-family:var(--label);font-weight:600;text-transform:uppercase;letter-spacing:.08em;font-size:clamp(.78rem,3.4vw,.95rem);white-space:nowrap}
 .hero{position:relative;overflow:hidden}
 .stage{position:relative;min-width:0;display:grid;place-items:center;padding-block:20px}
 .ghostlogo{position:absolute;right:-6%;bottom:-6%;width:min(78%,420px);height:auto;fill:none;stroke:var(--line);stroke-width:.45;pointer-events:none;transform:translateX(calc(var(--p,0)*-70px)) rotate(calc(var(--p,0)*-4deg))}
@@ -85,6 +85,7 @@ header .wrap{display:flex;align-items:center;justify-content:space-between;gap:1
 /* Controles debajo de la remera 3D */
 .tee-ctrl{position:relative;z-index:2;display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;margin-top:4px}
 .tee-col{display:flex;gap:8px}
+.tee-lbl{font:600 .78rem var(--label);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-right:-6px}
 .dot{width:30px;height:30px;border-radius:50%;border:2px solid var(--line);cursor:pointer;padding:0}
 .dot.negra{background:#1b1a19}.dot.blanca{background:#f4f2ee}
 .dot[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 30%,transparent)}
@@ -111,8 +112,8 @@ header .wrap{display:flex;align-items:center;justify-content:space-between;gap:1
 @keyframes blink{50%{opacity:.25}}
 @keyframes rise{from{opacity:0;translate:0 26px}to{opacity:1;translate:0 0}}
 @keyframes pop{from{opacity:0;scale:.92}to{opacity:1;scale:1}}
-.hero .lbl,.hero h1,.hero p,.hero .chips{animation:rise .8s cubic-bezier(.2,.7,.2,1) both}
-.hero h1{animation-delay:.08s}.hero p{animation-delay:.18s}.hero .chips{animation-delay:.28s}
+.hero .lbl,.hero h1,.hero p,.hero .chips,.hero .hero-cta{animation:rise .8s cubic-bezier(.2,.7,.2,1) both}
+.hero h1{animation-delay:.08s}.hero p{animation-delay:.18s}.hero .chips{animation-delay:.28s}.hero .hero-cta{animation-delay:.36s}
 
 .shot{margin:0;display:grid;gap:10px;justify-items:center;min-width:0;perspective:1000px}
 .frame{position:relative;width:100%;max-width:100%;transform-style:preserve-3d;transition:transform .4s}
@@ -210,6 +211,19 @@ textarea{min-height:70px;resize:vertical}
 .ico{width:1.1em;height:1.1em;flex:none;vertical-align:-.18em;margin-right:.35em}
 .ig{display:inline-flex;align-items:center}
 .hint.ask a .ico{color:#25D366}
+/* Barra fija con el total (solo celu, mientras armás el pedido) */
+.barra{display:none}
+@media (max-width:760px){
+  .barra{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:60;align-items:center;justify-content:space-between;gap:12px;padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(10px);border-top:1px solid var(--line);translate:0 110%;transition:translate .3s}
+  .barra.on{translate:0 0}
+  .barra div{display:grid;line-height:1.15}
+  .barra b{font-size:.85rem;color:var(--muted);font-weight:600}
+  .barra span{font:900 1.5rem var(--display)}
+  .barra .btn{flex:0 0 auto;padding:12px 18px}
+  body.con-barra .to-top{opacity:0;pointer-events:none}
+}
+.need{margin-top:8px}
+
 /* Flechita para volver arriba */
 html{scroll-behavior:smooth}
 .to-top{position:fixed;right:max(16px,env(safe-area-inset-right,0px));bottom:max(16px,env(safe-area-inset-bottom,0px));z-index:50;width:46px;height:46px;border-radius:50%;display:grid;place-items:center;background:var(--accent);color:var(--accent-ink);box-shadow:0 8px 24px rgba(0,0,0,.35);opacity:0;translate:0 12px;pointer-events:none;transition:opacity .3s,translate .3s}
@@ -272,7 +286,8 @@ footer .wrap{padding-block:28px;display:flex;flex-wrap:wrap;justify-content:spac
       <span class="lbl">Estampado DTF · Mar del Plata</span>
       <h1 id="titulo" style="margin-top:10px"><span class="ln">Remeras con</span> <span class="ln"><em>tu marca</em></span> <span class="ln">adelante y atrás</span></h1>
       <p>Para tu banda, tu cumple, tu equipo de trabajo o tu local. Armás los talles, ves el precio al instante y nos mandás el pedido por WhatsApp.</p>
-      <div class="chips"><span class="chip">Bandas</span><span class="chip">Empresas</span><span class="chip">Eventos</span><span class="chip">Comercios</span></div>
+      <p class="chips"><span>Bandas</span><span>Empresas</span><span>Eventos</span><span>Comercios</span></p>
+      <a class="btn main hero-cta" href="#pedido">Armá tu pedido</a>
     </div>
     <div class="stage">
       <svg class="ghostlogo" viewBox="0 0 150 151" aria-hidden="true"><use href="#logo" width="150" height="151"/></svg>
@@ -284,7 +299,7 @@ footer .wrap{padding-block:28px;display:flex;flex-wrap:wrap;justify-content:spac
       </div>
       <span class="stamp">S · M · L · XL · XXL</span>
       <div class="tee-ctrl" id="tee-ctrl" hidden>
-        <div class="tee-col" role="group" aria-label="Color de la remera">
+        <span class="tee-lbl">Color</span><div class="tee-col" role="group" aria-label="Color de la remera">
           <button type="button" class="dot negra" data-color="Negra" aria-label="Remera negra"></button>
           <button type="button" class="dot blanca" data-color="Blanca" aria-label="Remera blanca"></button>
         </div>
@@ -296,23 +311,6 @@ footer .wrap{padding-block:28px;display:flex;flex-wrap:wrap;justify-content:spac
   </div>
 </section>
 
-<section class="band taller" id="taller">
-  <div class="wrap">
-    <figure class="reel">
-      <video id="reel" src="aires-taller.mp4" poster="aires-taller.jpg" muted loop playsinline preload="none" aria-label="Video: así hacemos las remeras aires"></video>
-      <figcaption class="live"><i></i>Hecho en Mar del Plata</figcaption>
-    </figure>
-    <div class="taller-txt">
-      <span class="lbl">Cómo funciona</span>
-      <ul class="feats">
-        <li><span class="fs-n">01</span><div><b>Armá tu pedido</b><span>Elegí color y talles acá abajo y ves el precio al instante.</span></div></li>
-        <li><span class="fs-n">02</span><div><b>Mandalo por WhatsApp</b><span>Con tu logo. Confirmamos el diseño y abonás la seña del 50%.</span></div></li>
-        <li><span class="fs-n">03</span><div><b>Estampamos tus remeras</b><span>Te avisamos cuando están listas.</span></div></li>
-      </ul>
-      <a class="btn main" href="#pedido">Armar mi pedido</a>
-    </div>
-  </div>
-</section>
 
 <section class="band" id="pedido">
   <div class="wrap">
@@ -388,6 +386,7 @@ footer .wrap{padding-block:28px;display:flex;flex-wrap:wrap;justify-content:spac
           <button class="btn main" id="go" type="button">Enviar por WhatsApp</button>
           <button class="btn ghost" id="copy" type="button">Copiar mensaje</button>
         </div>
+        <p class="hint need" id="need">Sumá al menos una remera para enviar el pedido.</p>
         <div class="remind" id="remind" hidden>
           <b>Último paso: mandá tu logo en el chat</b>
           <ol>
@@ -405,6 +404,24 @@ footer .wrap{padding-block:28px;display:flex;flex-wrap:wrap;justify-content:spac
   </div>
 </section>
 
+<section class="band taller" id="taller">
+  <div class="wrap">
+    <figure class="reel">
+      <video id="reel" src="aires-taller.mp4" poster="aires-taller.jpg" muted loop playsinline preload="none" aria-label="Video: así hacemos las remeras aires"></video>
+      <figcaption class="live"><i></i>Hecho en Mar del Plata</figcaption>
+    </figure>
+    <div class="taller-txt">
+      <span class="lbl">Cómo funciona</span>
+      <ul class="feats">
+        <li><span class="fs-n">01</span><div><b>Elegí color y talles</b><span>Ves el precio al instante, sin esperar respuesta.</span></div></li>
+        <li><span class="fs-n">02</span><div><b>Mandalo por WhatsApp</b><span>Con tu logo. Confirmamos el diseño y abonás la seña del 50%.</span></div></li>
+        <li><span class="fs-n">03</span><div><b>Estampamos tus remeras</b><span>Te avisamos cuando están listas.</span></div></li>
+      </ul>
+      <a class="btn main" href="#pedido">Ir al pedido</a>
+    </div>
+  </div>
+</section>
+
 <footer>
   <div class="wrap">
     <span>aires · remeras estampadas · Mar del Plata</span>
@@ -413,6 +430,10 @@ footer .wrap{padding-block:28px;display:flex;flex-wrap:wrap;justify-content:spac
   </div>
 </footer>
 
+<div class="barra" id="barra" aria-hidden="true">
+  <div><b id="barra-n">0 remeras</b><span id="barra-t">$0</span></div>
+  <button class="btn main" id="barra-go" type="button" tabindex="-1">Enviar pedido</button>
+</div>
 <a class="to-top" id="to-top" href="#top" aria-label="Volver arriba"><svg aria-hidden="true"><use href="#i-up"/></svg></a>
 
 <script>
@@ -546,6 +567,8 @@ footer .wrap{padding-block:28px;display:flex;flex-wrap:wrap;justify-content:spac
     const wa=$("wa");
     wa.href=`https://wa.me/${PHONE}?text=${encodeURIComponent(msg)}`;
     $("go").disabled=!okMin;
+    $("need").hidden=okMin;
+    $("barra-n").textContent=`${total} ${total===1?"remera":"remeras"}`;$("barra-t").textContent=fmt(amount);$("barra-go").disabled=!okMin;
     if(!okMin)showRemind(false);
 
   }
@@ -564,6 +587,17 @@ footer .wrap{padding-block:28px;display:flex;flex-wrap:wrap;justify-content:spac
   });
 
   update();
+
+  // Barra fija: aparece mientras estás en el pedido y se esconde cuando ya ves el resumen
+  (function(){
+    const bar=$("barra"),ped=$("pedido"),res=$("total").closest("aside")||$("acts");let enPed=false,veRes=false;
+    const pinta=()=>{const on=enPed&&!veRes;bar.classList.toggle("on",on);document.body.classList.toggle("con-barra",on);bar.setAttribute("aria-hidden",!on)};
+    new IntersectionObserver(e=>{enPed=e[0].isIntersecting;pinta()},{threshold:0}).observe(ped);
+    new IntersectionObserver(e=>{veRes=e[0].isIntersecting;pinta()},{threshold:.35}).observe(res);
+    $("barra-go").addEventListener("click",()=>{res.scrollIntoView({behavior:"smooth",block:"start"});setTimeout(()=>$("go").click(),450)});
+  })();
+  // Al tocar un número de talle se selecciona, así se escribe directo (útil para pedidos grandes)
+  document.querySelectorAll('#sizes input').forEach(i=>i.addEventListener("focus",()=>i.select()));
 
   // Color del formulario <-> color de la remera 3D
   document.querySelectorAll('input[name="color"]').forEach(r=>r.addEventListener("change",()=>{if(window.tee)window.tee.color(val("color"))}));
